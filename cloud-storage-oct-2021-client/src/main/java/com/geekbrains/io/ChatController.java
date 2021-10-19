@@ -90,6 +90,7 @@ public class ChatController implements Initializable {
 
     public void sendMessage(ActionEvent actionEvent) throws IOException {
         String fileNasme = input.getText();
+        input.clear();
         Path filePath = root.resolve(fileNasme);
         if (Files.exists(filePath)){
             dos.writeUTF(fileNasme);
