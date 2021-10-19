@@ -1,5 +1,6 @@
 package com.geekbrains.io;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -26,7 +27,17 @@ public class ChatController implements Initializable {
             Socket socket = new Socket("localhost", 8189);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-            Thread readThread = new Thread(()->{});
+            Thread readThread = new Thread(()->{
+                try {
+                    while (true){
+                        String message = dis.readUTF();
+                        Platform.runLater(()->listView.getItems().add(message));
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
             readThread.setDaemon(true);
             readThread.start();
         } catch (IOException e) {
