@@ -22,7 +22,7 @@ public class ChatHandler implements Runnable {
         this.server = server;
         cnt++;
         userName = "User#" + cnt;
-        format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+        format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         dis = new DataInputStream(socket.getInputStream());
         dos = new DataOutputStream(socket.getOutputStream());
     }
@@ -32,7 +32,7 @@ public class ChatHandler implements Runnable {
         try {
             while (true) {
                 String msg = dis.readUTF();
-                server.broadCastMessage(msg);
+                server.broadCastMessage(getMessage(msg));
             }
         } catch (Exception e) {
             System.err.println("Connection was broken");
@@ -49,7 +49,6 @@ public class ChatHandler implements Runnable {
     }
 
     public void sendMessage(String msg) throws IOException {
-        dos.writeUTF(getMessage(msg));
-        dos.flush();
+        dos.writeUTF(msg);
     }
 }
