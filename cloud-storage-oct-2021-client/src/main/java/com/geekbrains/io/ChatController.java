@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
@@ -19,8 +20,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class ChatController implements Initializable {
-    private Path root;
 
+    private Path root;
+    private  byte[] buffer;
     public ListView<String> listView;
     public TextField input;
     private DataOutputStream dos;
@@ -28,7 +30,7 @@ public class ChatController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        buffer = new byte[1024];
         root = Paths.get("root");
         if (!Files.exists(root)) {
             try {
@@ -92,7 +94,13 @@ public class ChatController implements Initializable {
         if (Files.exists(filePath)){
             dos.writeUTF(fileNasme);
             dos.writeLong(Files.size(filePath));
-            Files.copy(filePath,dos);
+            FileInputStream fis = new FileInputStream(filePath.toFile());
+            int read = 0;
+            while ((read = fis.read(buffer))!=-1){
+                dos.write(buffer,0,read);
+            }
+            fis.close();
+//            Files.copy(filePath,dos);
             dos.flush();
         }
        /* dos.writeUTF(message);
