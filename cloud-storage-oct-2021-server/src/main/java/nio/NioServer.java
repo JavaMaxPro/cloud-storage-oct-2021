@@ -22,7 +22,7 @@ public class NioServer {
     public NioServer() throws IOException {
         buffer = ByteBuffer.allocate(256);
         server = ServerSocketChannel.open(); // accept -> SocketChannel
-        server.bind(new InetSocketAddress(8189));
+        server.bind(new InetSocketAddress(8182));
         selector = Selector.open();
         server.configureBlocking(false);
         server.register(selector, SelectionKey.OP_ACCEPT);
@@ -53,7 +53,7 @@ public class NioServer {
             int read = channel.read(buffer);
             if(read == -1){
                 channel.close();
-                return;;
+                return;
             }
 
             if(read == 0){
@@ -66,7 +66,7 @@ public class NioServer {
             }
             buffer.clear();
 
-            String result = "[From serever]: "sb.toString();
+            String result = "[From serever]: " + sb.toString();
 
             channel.write(ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8)));
         }
@@ -80,7 +80,7 @@ public class NioServer {
         channel.register(selector, SelectionKey.OP_READ);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new NioServer();
     }
 }
