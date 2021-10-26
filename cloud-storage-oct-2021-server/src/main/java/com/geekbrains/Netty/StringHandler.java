@@ -23,5 +23,8 @@ public class StringHandler extends SimpleChannelInboundHandler<String> {
         ctx.write(result);
     }
 
-
+//    @Override
+//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+//        super.exceptionCaught(ctx, cause);
+//    }
 }
