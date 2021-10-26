@@ -26,7 +26,7 @@ public class NioServer {
 
 
     public NioServer() throws IOException {
-        root = Path.of("cloud-storage-oct-2021");
+        root = Path.of("cloud-storage-oct-2021-server");
         buffer = ByteBuffer.allocate(256);
         server = ServerSocketChannel.open(); // accept -> SocketChannel
         server.bind(new InetSocketAddress(8182));
@@ -42,9 +42,11 @@ public class NioServer {
                 SelectionKey key = iterator.next();
                 if (key.isAcceptable()) {
                     handleAccept(key);
+                    System.out.println("Accept");
                 }
                 if (key.isReadable()) {
                     handleRead(key);
+                    System.out.println("Read - ");
                 }
                 iterator.remove();
             }
@@ -73,19 +75,21 @@ public class NioServer {
             }
             buffer.clear();
             Path filePath;
-            String result = sb.toString();
-            String[] arrResult = result.split(" ");
-            arrResult[0].trim();
-            System.out.println(arrResult[0]);
-            if (arrResult[0].equals("ls")) {
+            String result = sb.toString().trim();
+//            String[] arrResult = result.split(" ");
+//            arrResult[0].trim();
+//            arrResult[0].toLowerCase(Locale.ROOT);
+//            System.out.println(arrResult[0]);
+            if (result.equals("ls")) {
                 String fileList = Files.list(root)
                         .map(this::mapper)
                         .collect(Collectors.joining("\n")) + "\n";
                 printCurrentDirName(channel);
-                System.out.println(arrResult[0]);
+                channel.write(ByteBuffer.wrap(fileList.getBytes(StandardCharsets.UTF_8)));
+               System.out.println( "я в - " + result);
             } else {
-                if (arrResult[0].equals("cat"))  {
-                    filePath = root.resolve(arrResult[1]);
+                if (result.equals("cat")) {
+                    filePath = root.resolve(result);
                     if (Files.exists(filePath)) {
                         List<String> fileReadLine = Files.readAllLines(filePath, StandardCharsets.UTF_8);
                         for (String s : fileReadLine) {
@@ -93,19 +97,11 @@ public class NioServer {
                         }
                     }
                 } else {
-                    channel.write(ByteBuffer.wrap("No command \n\r".getBytes(StandardCharsets.UTF_8)));
+                    channel.write(ByteBuffer.wrap("No command \n \r".getBytes(StandardCharsets.UTF_8)));
                     printCurrentDirName(channel);
-                    break;
                 }
             }
-/*                case "cd":
-                    break;
-                case "touch":
-                    break;*/
 
-
-            channel.write(ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8)));
-            printCurrentDirName(channel);
         }
 
     }
@@ -117,11 +113,11 @@ public class NioServer {
     private String mapper(Path path) {
 
         if (Files.isDirectory(root)) {
-            return String.format("DIR " + path.getFileName().toString());
+            return path.getFileName().toString() + " [ DIR ]";
         } else {
             try {
                 long size = Files.size(root);
-                return String.format("FILE " + path.getFileName().toString() + " bytes");
+                return path.getFileName().toString() + "[ FILE ]" + size + " bytes";
             } catch (Exception e) {
                 throw new RuntimeException("path not exist");
             }
