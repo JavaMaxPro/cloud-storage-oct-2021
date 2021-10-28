@@ -89,11 +89,11 @@ public class ChatController implements Initializable {
     }
 
     public void sendMessage(ActionEvent actionEvent) throws IOException {
-        String fileNasme = input.getText();
+        String fileName = input.getText();
         input.clear();
-        Path filePath = root.resolve(fileNasme);
+        Path filePath = root.resolve(fileName);
         if (Files.exists(filePath)){
-            dos.writeUTF(fileNasme);
+            dos.writeUTF(fileName);
             dos.writeLong(Files.size(filePath));
             FileInputStream fis = new FileInputStream(filePath.toFile());
             int read = 0;
